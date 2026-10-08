@@ -8,7 +8,7 @@ from datetime import datetime
 
 # --- Configuration ---
 DATA_DIR = "temp_data"
-EXPIRATION_HOURS = 24 # Extended to 24 hours since it's an inbox
+EXPIRATION_MINUTES = 5 # Transfers are deleted 5 minutes after being sent
 
 # Ensure data directory exists
 if not os.path.exists(DATA_DIR):
@@ -25,7 +25,7 @@ def cleanup_old_data():
                 transfer_dir = os.path.join(device_dir, transfer_id)
                 if os.path.isdir(transfer_dir):
                     folder_time = os.path.getmtime(transfer_dir)
-                    if (now - folder_time) > (EXPIRATION_HOURS * 3600):
+                    if (now - folder_time) > (EXPIRATION_MINUTES * 60):
                         try:
                             shutil.rmtree(transfer_dir)
                         except Exception:
@@ -119,7 +119,7 @@ with tab_send:
 # --- Tab 2: Inbox ---
 with tab_inbox:
     st.header("📥 我的收件匣")
-    st.write("別人發送給您的資料會出現在這裡。")
+    st.write(f"別人發送給您的資料會出現在這裡，{EXPIRATION_MINUTES} 分鐘後自動刪除。")
     
     col_refresh, _ = st.columns([1, 4])
     with col_refresh:
