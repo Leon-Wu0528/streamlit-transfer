@@ -9,6 +9,7 @@ from datetime import datetime
 # --- Configuration ---
 DATA_DIR = "temp_data"
 EXPIRATION_HOURS = 12 # Transfers are deleted 12 hours after being sent
+DEFAULT_DEVICE_ID = "0" # Default device ID for new users and ID inputs
 
 # Ensure data directory exists
 if not os.path.exists(DATA_DIR):
@@ -33,10 +34,6 @@ def cleanup_old_data():
 
 cleanup_old_data()
 
-def generate_device_id():
-    """Generates a random ID like Device-XXXX"""
-    return f"Device-{''.join(random.choices(string.digits, k=4))}"
-
 def generate_transfer_id():
     return f"T-{''.join(random.choices(string.ascii_uppercase + string.digits, k=6))}"
 
@@ -53,12 +50,12 @@ if 'device_id' not in st.session_state:
     with col1:
         st.subheader("🆕 新用戶")
         if st.button("創建新設備 ID", type="primary", use_container_width=True):
-            st.session_state.device_id = generate_device_id()
+            st.session_state.device_id = DEFAULT_DEVICE_ID
             st.rerun()
             
     with col2:
         st.subheader("🔑 現有用戶")
-        existing_id = st.text_input("輸入您的設備 ID (例如 Device-1234):")
+        existing_id = st.text_input("輸入您的設備 ID:", value=DEFAULT_DEVICE_ID)
         if st.button("登入", use_container_width=True):
             if existing_id.strip():
                 st.session_state.device_id = existing_id.strip()
@@ -81,7 +78,7 @@ tab_send, tab_inbox = st.tabs(["📤 發送資料給別人", f"📥 我的收件
 # --- Tab 1: Send Data ---
 with tab_send:
     st.header("📤 發送資料")
-    target_id = st.text_input("要發送給誰？ (請輸入對方的設備 ID，例如 Device-1234):")
+    target_id = st.text_input("要發送給誰？ (請輸入對方的設備 ID):", value=DEFAULT_DEVICE_ID)
     
     text_input = st.text_area("在這裡粘貼文字:", height=150)
     uploaded_files = st.file_uploader("上傳文件:", accept_multiple_files=True)
